@@ -1,0 +1,64 @@
+Additions
+
+1. Changes to allow for future incorporation into a Password Control component.
+2. Implement update servers for future releases
+3. Make use of Joomla global definitions where possible instead of defining our own.
+4. Allow multiple user passwords to be stored and checked.
+5. Permit checking of the previous password to be bypassed.
+6. Implemented checks on initial connection attempts.  Checks how many invalid password attempts are made and if it exceeds the site defined 
+   maximum, the account is temporarily suspended for a defined time period.
+
+Corrections:
+
+1.  Minor correction to remove warning around setting of euser (old line 118)
+2.  Inclusion of additional include to prevent message about JParameter class not being found.  Found on some installations but not all.
+3.  Replace an english message text in one specific message display previously overlooked. 
+4.  Correct parameter in call to password checking routine.
+5.  Raise exception when duplicate password found instead of handling it ourselves. 
+
+Other:
+Coding clear up - removal of unnecessary code.
+Simplification of internal variable naming.
+Moved creation of the control table entries to the onUserAfterSave event instead on onAfterRoute event.
+Modfied parameters concerning redirection after a forced change to a single parameter rather than two separate ones.  Code structure changes made the change easy to implement.
+Removed some of the javascript to make use of enqueueMessage instead, which is cleaner.
+
+Comments:
+
+For performance reasons it was desirable to use a bespoke database function for password checks against previously specified user passwords.  
+In developing this password checking function it was discovered that to perform the checking in the database required the MySQL binlog_format 
+to be set to ROW or MIXED, otherwise the function failed.  The setting discovered on the internal databases was set to ROW.  
+The setting is used by MySQL specifically where replication is being performed between database.
+The default setting for all MySQL 6 databases and above is set to MIXED, but I am wary of forcing a change upon all users of the plugin.
+For that reason there is PHP checking routine included as part of the plugin as well as the database function.  Which is used depends upon the 
+setting of the DBCHECK parameter.  The default is to use the PHP routine. In tests the database routine is faster for large number of passwords 
+being checked which might be the preference, but because of the logging this is not the default.   Both routines generate the same result.
+If database replication is not a consideration for a site then for speed the database routine is recommended.
+
+The storing of multiple passwords for a user is performed by a bespoke MySQL database procedure created when the plugin is installed.  
+The database procedure for storing passwords in the control table is not impacted by the logging mode.  This procedure is also responsible for the 
+initial creation of the user entry in our control table.
+
+Note:
+When an administrator is performing a password change for a user, they do not use the onAfterRoute functionality however they do make use of the
+onUserAfterSave routine.  The check for a password being previously used is therefore in force and the administrator will be presented with a 
+message stating that the account user already has the password in their 'history' if the specified password has been previously used.  This is not 
+an error but expected functionality.
+
+The password checks are applicable for all users.  There is no concept of any users being exempt from the prevension of reusing old passwords.
+
+The login code makes use of cookies to control the number of invalid login attempts.  If a tabbed browser is being used, it means that all 
+browser tabs and windows by one user share the session.  This is on the whole desirable, and it would become very annoying for sites that made you
+login for each new tab, since generally tabs are used quite intensively.  One consequence of this is that if a tabbed browser is being used for more
+than one login, as different users the results can get very confusing.
+
+
+To do/problems
+
+
+Extensions text:
+
+The Password Control system plugin enforces password changes upon registered site users. The change can be enforced for the initial (first) connection only, and/or for periodic changing.
+Optionally the users can be redirected back to the home page when a password change is enforced.
+There is the ability to define 'exempt' users, i.e. users for whom the administrator does not want to enforce password changing.
+The password entered by the user is checked against the previous password to ensure that it is changed and that the user is not reusing the same password again, or just pressing the submit buttom without providing a new password
