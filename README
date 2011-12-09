@@ -1,9 +1,9 @@
-This is the release candidate RC2 for the Password Control plugin for Joomla 1.7.
+This is the 0.0.3 release of the Password Control plugin for Joomla 1.7.
 The intent is to enhance (or more accurately provide) some password checking to Joomla 
 over a simple comparison that the two specified passwords are identical.
 
 This version adds database tables and enhanced password checking of users.  The check is also performed on an actual last password change date rather than the last visit date (which was always a little suspect but permitted work to proceed).  It also allows specific exempt users from having to change their passwords.
 
 Geoff Chapman
-1st October 2011
+9th December 2011
 [When added to github.]
